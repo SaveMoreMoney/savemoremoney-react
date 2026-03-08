@@ -1,4 +1,4 @@
-git .home-page {
+.home-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
@@ -7,7 +7,7 @@ git .home-page {
 /* Hero Section */
 .home-hero {
   text-align: center;
-  padding: var(--spacing-2xl) 0;
+  padding: var(--spacing-2xl) var(--spacing-lg);
   margin-bottom: var(--spacing-2xl);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: var(--radius-xl);

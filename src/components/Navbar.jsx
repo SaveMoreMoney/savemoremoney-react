@@ -44,15 +44,6 @@ const Navbar = () => {
               Consult
             </NavLink>
           </li>
-          <li>
-            <NavLink 
-              to="/admin" 
-              className={({ isActive }) => isActive ? 'active' : ''} 
-              onClick={closeMenu}
-            >
-              Admin
-            </NavLink>
-          </li>
         </ul>
       </div>
     </nav>

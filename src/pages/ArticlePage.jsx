@@ -17,7 +17,8 @@ const ArticlePage = () => {
         .from('articles')
         .select('*')
         .eq('slug', slug)
-        .single(); // .single() is crucial for getting one object, not an array
+        .eq('is_published', true)
+        .single();
 
       if (error) {
         console.error('Error fetching article:', error);
@@ -33,21 +34,39 @@ const ArticlePage = () => {
     fetchArticle();
   }, [slug]);
 
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  // Helper function to get author initials
+  const getAuthorInitials = (name) => {
+    if (!name) return 'M';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
+
+  // Helper function to extract excerpt for meta description
+  const extractExcerpt = (htmlContent, maxLength = 160) => {
+    const div = document.createElement('div');
+    div.innerHTML = htmlContent;
+    const text = div.textContent || div.innerText || '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
   if (loading) {
     return <div className="loader">Loading article...</div>;
   }
 
-  if (error) {
+  if (error || !article) {
     return (
-      <div className="error-message">
-        <p>{error}</p>
-        <Link to="/">Go back to Home</Link>
+      <div className="article-page">
+        <div className="error-message">
+          <p>{error || 'Article not found'}</p>
+          <Link to="/">← Back to Home</Link>
+        </div>
       </div>
     );
-  }
-
-  if (!article) {
-    return null; // Should be covered by error state, but as a fallback.
   }
 
   // The content from the database is expected to be safe HTML
@@ -59,22 +78,62 @@ const ArticlePage = () => {
   return (
     <>
       <Helmet>
-        <title>{article.title}</title>
-        <meta name="description" content={article.snippet || 'An article from SaveMoreMoney.in'} />
+        <title>{article.title} | SaveMoreMoney.in</title>
+        <meta name="description" content={extractExcerpt(article.content)} />
+        <meta property="og:title" content={article.title} />
+        <meta property="og:description" content={extractExcerpt(article.content)} />
+        {article.image_url && <meta property="og:image" content={article.image_url} />}
+        <meta property="og:type" content="article" />
       </Helmet>
-      <article className="article-page">
-        <header className="article-header">
-          <h1>{article.title}</h1>
-          <p className="article-meta">
-            By {article.author_name || 'Mausaji'} on {new Date(article.created_at).toLocaleDateString()}
-          </p>
-        </header>
-        {article.image_url && <img src={article.image_url} alt={article.title} className="article-banner-image" />}
-        <div 
-          className="article-content"
-          dangerouslySetInnerHTML={createMarkup(article.content)}
-        />
-      </article>
+      
+      <div className="article-page">
+        <Link to="/" className="back-to-home">
+          <span>←</span> Back to Home
+        </Link>
+
+        <article className="article-container">
+          <header className="article-header">
+            <div className="article-header-content">
+              {article.category && (
+                <span className="article-category">{article.category}</span>
+              )}
+              <h1>{article.title}</h1>
+              <div className="article-meta">
+                <div className="meta-item author-info">
+                  <div className="author-avatar-large">
+                    {getAuthorInitials(article.author_name || 'Mausaji')}
+                  </div>
+                  <span>By {article.author_name || 'Mausaji'}</span>
+                </div>
+                <div className="meta-item">
+                  <span>📅</span>
+                  <span>{formatDate(article.created_at)}</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {article.image_url && (
+            <img 
+              src={article.image_url} 
+              alt={article.title} 
+              className="article-banner-image" 
+            />
+          )}
+
+          <div className="article-body">
+            <div 
+              className="article-content"
+              dangerouslySetInnerHTML={createMarkup(article.content)}
+            />
+
+            <div className="article-share">
+              <h3>Found this helpful?</h3>
+              <p>Share this article with your friends and family to help them save more money too!</p>
+            </div>
+          </div>
+        </article>
+      </div>
     </>
   );
 };
