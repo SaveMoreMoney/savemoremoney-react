@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../services/supabaseClient';
+import { getCachedData, setCachedData } from '../utils/storage';
+import FinancialSnapshot from '../components/FinancialSnapshot';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -12,6 +14,14 @@ const HomePage = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
+      const cachedArticles = getCachedData('articles');
+
+      if (cachedArticles) {
+        setArticles(cachedArticles);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('articles')
         .select('*')
@@ -23,6 +33,7 @@ const HomePage = () => {
         setError('Failed to load articles. Please try again later.');
       } else {
         setArticles(data);
+        setCachedData('articles', data);
       }
       setLoading(false);
     };
@@ -30,24 +41,9 @@ const HomePage = () => {
     fetchArticles();
   }, []);
 
-  // Helper function to extract text from HTML content
-  const extractExcerpt = (htmlContent, maxLength = 150) => {
-    const div = document.createElement('div');
-    div.innerHTML = htmlContent;
-    const text = div.textContent || div.innerText || '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-  };
-
-  // Helper function to format date
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
-  };
-
-  // Helper function to get author initials
-  const getAuthorInitials = (name) => {
-    if (!name) return 'M';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   };
 
   if (loading) {
@@ -73,6 +69,9 @@ const HomePage = () => {
     );
   }
 
+  const featuredArticle = articles.find(a => a.slug.includes('singapore'));
+  const otherArticles = articles.filter(a => a.id !== (featuredArticle && featuredArticle.id)).slice(0, 2);
+
   return (
     <>
       <Helmet>
@@ -83,7 +82,6 @@ const HomePage = () => {
       </Helmet>
       
       <div className="home-page">
-        {/* Hero Section */}
         <section className="home-hero">
           <div className="home-hero-content">
             <h1>💰 Master Your Money</h1>
@@ -101,6 +99,10 @@ const HomePage = () => {
                 <span className="stat-label">Readers</span>
               </div>
               <div className="stat-item">
+                <span className="stat-number">5+</span>
+                <span className="stat-label">Years of Exp</span>
+              </div>
+              <div className="stat-item">
                 <span className="stat-number">100%</span>
                 <span className="stat-label">Free</span>
               </div>
@@ -108,44 +110,40 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* Articles Section */}
-        <section>
+        <FinancialSnapshot articles={articles} />
+
+        <section className="latest-insights-section">
           <div className="section-header">
             <h2>Latest Financial Insights</h2>
             <p>Stay updated with the latest tips and strategies to grow your wealth</p>
           </div>
 
           {articles.length > 0 ? (
-            <div className="articles-grid">
-              {articles.map(article => (
-                <Link to={`/${article.slug}`} key={article.id} className="article-card">
-                  <div className="article-card-image">
-                    {article.image_url ? (
-                      <img src={article.image_url} alt={article.title} />
-                    ) : (
-                      <span>📊</span>
-                    )}
+            <div className="bento-grid">
+              {featuredArticle && (
+                <Link to={`/${featuredArticle.slug}`} className="bento-box featured">
+                  {featuredArticle.image_url ? (
+                    <img src={featuredArticle.image_url} alt={featuredArticle.title} />
+                  ) : (
+                    <div className="bento-placeholder"></div>
+                  )}
+                  <div className="bento-content">
+                    <span className="bento-badge">New</span>
+                    <h3>{featuredArticle.title}</h3>
+                    <span className="bento-date">{formatDate(featuredArticle.created_at)}</span>
                   </div>
-                  <div className="card-content">
-                    {article.category && (
-                      <span className="card-category">{article.category}</span>
-                    )}
-                    <h2>{article.title}</h2>
-                    <p className="card-excerpt">
-                      {extractExcerpt(article.content)}
-                    </p>
-                    <div className="card-footer">
-                      <div className="card-author">
-                        <div className="author-avatar">
-                          {getAuthorInitials(article.author_name || 'Mausaji')}
-                        </div>
-                        <span>{article.author_name || 'Mausaji'}</span>
-                      </div>
-                      <span className="card-date">{formatDate(article.created_at)}</span>
-                    </div>
-                    <span className="read-more">
-                      Read Article <span>→</span>
-                    </span>
+                </Link>
+              )}
+              {otherArticles.map(article => (
+                <Link to={`/${article.slug}`} key={article.id} className="bento-box">
+                  {article.image_url ? (
+                    <img src={article.image_url} alt={article.title} />
+                  ) : (
+                    <div className="bento-placeholder"></div>
+                  )}
+                  <div className="bento-content">
+                    <h3>{article.title}</h3>
+                    <span className="bento-date">{formatDate(article.created_at)}</span>
                   </div>
                 </Link>
               ))}
@@ -157,6 +155,9 @@ const HomePage = () => {
               <p>Check back soon for expert financial advice and money-saving tips!</p>
             </div>
           )}
+          <div className="explore-more">
+            <Link to="/articles" className="explore-btn">Explore All Articles</Link>
+          </div>
         </section>
       </div>
     </>

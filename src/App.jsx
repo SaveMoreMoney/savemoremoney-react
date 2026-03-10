@@ -13,6 +13,7 @@ import ArticlePage from './pages/ArticlePage';
 import AdminPage from './pages/AdminPage';
 import ConsultPage from './pages/ConsultPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ArticlesPage from './pages/ArticlesPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/articles" element={<ArticlesPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/consult" element={<ConsultPage />} />
             <Route path="/:slug" element={<ArticlePage />} />

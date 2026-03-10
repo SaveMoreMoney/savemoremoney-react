@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../services/supabaseClient';
+import ReadingProgress from '../components/ReadingProgress';
 import './ArticlePage.css';
 
 const ArticlePage = () => {
@@ -85,6 +86,8 @@ const ArticlePage = () => {
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
       </Helmet>
+      
+      <ReadingProgress />
       
       <div className="article-page">
         <Link to="/" className="back-to-home">
