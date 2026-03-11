@@ -14,6 +14,7 @@ import AdminPage from './pages/AdminPage';
 import ConsultPage from './pages/ConsultPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ArticlesPage from './pages/ArticlesPage';
+import AboutPage from './pages/AboutPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/articles" element={<ArticlesPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/consult" element={<ConsultPage />} />
             <Route path="/:slug" element={<ArticlePage />} />

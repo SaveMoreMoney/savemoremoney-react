@@ -1,7 +1,28 @@
-.article-page {
-  max-width: 900px;
+.article-page-container {
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
+}
+
+.article-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-2xl);
+}
+
+/* Two-column layout for larger screens */
+@media (min-width: 1024px) {
+  .article-layout {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); /* 75% content, 25% sidebar */
+  }
+}
+
+.article-main-content {
+  min-width: 0; /* Prevents overflow issues in grid */
+}
+
+.article-sidebar {
+  min-width: 0; /* Prevents overflow issues in grid */
 }
 
 .article-container {
@@ -320,10 +341,6 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .article-page {
-    padding: 0 var(--spacing-md);
-  }
-  
   .article-header {
     padding: var(--spacing-xl) var(--spacing-md);
   }

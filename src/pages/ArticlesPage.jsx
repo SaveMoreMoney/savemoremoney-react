@@ -1,44 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../services/supabaseClient';
 import { getCachedData, setCachedData } from '../utils/storage';
 import './ArticlesPage.css';
 
+const ARTICLES_PER_PAGE = 9;
+
 const ArticlesPage = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
-      const cachedArticles = getCachedData('articles');
+      
+      // Try to get cached articles first
+      // Note: For pagination, caching all articles might be heavy if there are thousands.
+      // But for a blog with < 1000 articles, it's fine to fetch all and paginate client-side for speed
+      // or implement server-side pagination. Here we'll stick to client-side pagination for simplicity with existing cache logic.
+      
+      let allArticles = getCachedData('articles');
 
-      if (cachedArticles) {
-        setArticles(cachedArticles);
-        setLoading(false);
-        return;
+      if (!allArticles) {
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .eq('status', 'publish')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching articles:', error);
+          setError('Failed to load articles. Please try again later.');
+          setLoading(false);
+          return;
+        } else {
+          allArticles = data;
+          setCachedData('articles', data);
+        }
       }
 
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .eq('status', 'publish')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching articles:', error);
-        setError('Failed to load articles. Please try again later.');
-      } else {
-        setArticles(data);
-        setCachedData('articles', data);
-      }
+      setTotalPages(Math.ceil(allArticles.length / ARTICLES_PER_PAGE));
+      
+      // Slice articles for current page
+      const startIndex = (currentPage - 1) * ARTICLES_PER_PAGE;
+      const endIndex = startIndex + ARTICLES_PER_PAGE;
+      setArticles(allArticles.slice(startIndex, endIndex));
+      
       setLoading(false);
+      window.scrollTo(0, 0);
     };
 
     fetchArticles();
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (newPage) => {
+    setSearchParams({ page: newPage });
+  };
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -105,6 +127,28 @@ const ArticlesPage = () => {
             </Link>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button 
+              className="pagination-btn" 
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              ← Previous
+            </button>
+            <span className="pagination-info">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button 
+              className="pagination-btn" 
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next →
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
