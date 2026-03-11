@@ -18,7 +18,7 @@ const ArticlePage = () => {
         .from('articles')
         .select('*')
         .eq('slug', slug)
-        .eq('is_published', true)
+        .eq('status', 'publish')
         .single();
 
       if (error) {
@@ -26,6 +26,8 @@ const ArticlePage = () => {
         setError('Failed to load the article.');
       } else if (data) {
         setArticle(data);
+        // Increment view count
+        incrementViewCount(data.id, data.views);
       } else {
         setError('Article not found.');
       }
@@ -34,6 +36,40 @@ const ArticlePage = () => {
 
     fetchArticle();
   }, [slug]);
+
+  const incrementViewCount = async (articleId, currentViews) => {
+    try {
+      await supabase
+        .from('articles')
+        .update({ views: (currentViews || 0) + 1 })
+        .eq('id', articleId);
+    } catch (err) {
+      console.error('Error incrementing view count:', err);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!article) return;
+    
+    // Check if already liked in this session to prevent spam
+    const likedArticles = JSON.parse(localStorage.getItem('liked_articles') || '[]');
+    if (likedArticles.includes(article.id)) return;
+
+    try {
+      const newLikes = (article.likes || 0) + 1;
+      const { error } = await supabase
+        .from('articles')
+        .update({ likes: newLikes })
+        .eq('id', article.id);
+        
+      if (!error) {
+        setArticle(prev => ({ ...prev, likes: newLikes }));
+        localStorage.setItem('liked_articles', JSON.stringify([...likedArticles, article.id]));
+      }
+    } catch (err) {
+      console.error('Error liking article:', err);
+    }
+  };
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -80,9 +116,9 @@ const ArticlePage = () => {
     <>
       <Helmet>
         <title>{article.title} | SaveMoreMoney.in</title>
-        <meta name="description" content={extractExcerpt(article.content)} />
+        <meta name="description" content={article.excerpt || extractExcerpt(article.content)} />
         <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={extractExcerpt(article.content)} />
+        <meta property="og:description" content={article.excerpt || extractExcerpt(article.content)} />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
       </Helmet>
@@ -104,13 +140,17 @@ const ArticlePage = () => {
               <div className="article-meta">
                 <div className="meta-item author-info">
                   <div className="author-avatar-large">
-                    {getAuthorInitials(article.author_name || 'Mausaji')}
+                    {getAuthorInitials(article.author || 'Mausaji')}
                   </div>
-                  <span>By {article.author_name || 'Mausaji'}</span>
+                  <span>By {article.author || 'Mausaji'}</span>
                 </div>
                 <div className="meta-item">
                   <span>📅</span>
                   <span>{formatDate(article.created_at)}</span>
+                </div>
+                <div className="meta-item">
+                  <span>👁️</span>
+                  <span>{article.views || 0} views</span>
                 </div>
               </div>
             </div>
@@ -133,6 +173,13 @@ const ArticlePage = () => {
             <div className="article-share">
               <h3>Found this helpful?</h3>
               <p>Share this article with your friends and family to help them save more money too!</p>
+              <button 
+                className="like-button" 
+                onClick={handleLike}
+                disabled={JSON.parse(localStorage.getItem('liked_articles') || '[]').includes(article.id)}
+              >
+                ❤️ {article.likes || 0} Likes
+              </button>
             </div>
           </div>
         </article>

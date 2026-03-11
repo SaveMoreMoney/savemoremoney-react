@@ -288,6 +288,36 @@
   color: var(--text-primary);
 }
 
+.like-button {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin-top: var(--spacing-md);
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.like-button:hover:not(:disabled) {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+  transform: translateY(-2px);
+}
+
+.like-button:disabled {
+  background-color: #fee2e2;
+  color: #ef4444;
+  border-color: #ef4444;
+  cursor: default;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .article-page {

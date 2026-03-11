@@ -25,7 +25,7 @@ const HomePage = () => {
       const { data, error } = await supabase
         .from('articles')
         .select('*')
-        .eq('is_published', true)
+        .eq('status', 'publish')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -130,7 +130,12 @@ const HomePage = () => {
                   <div className="bento-content">
                     <span className="bento-badge">New</span>
                     <h3>{featuredArticle.title}</h3>
-                    <span className="bento-date">{formatDate(featuredArticle.created_at)}</span>
+                    <div className="bento-meta">
+                      <span className="bento-date">{formatDate(featuredArticle.created_at)}</span>
+                      <span className="bento-stats">
+                        {featuredArticle.views || 0} views • {featuredArticle.likes || 0} likes
+                      </span>
+                    </div>
                   </div>
                 </Link>
               )}
@@ -143,7 +148,12 @@ const HomePage = () => {
                   )}
                   <div className="bento-content">
                     <h3>{article.title}</h3>
-                    <span className="bento-date">{formatDate(article.created_at)}</span>
+                    <div className="bento-meta">
+                      <span className="bento-date">{formatDate(article.created_at)}</span>
+                      <span className="bento-stats">
+                        {article.views || 0} views
+                      </span>
+                    </div>
                   </div>
                 </Link>
               ))}

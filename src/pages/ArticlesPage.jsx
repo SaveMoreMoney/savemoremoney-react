@@ -24,7 +24,7 @@ const ArticlesPage = () => {
       const { data, error } = await supabase
         .from('articles')
         .select('*')
-        .eq('is_published', true)
+        .eq('status', 'publish')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -91,9 +91,15 @@ const ArticlesPage = () => {
                 )}
               </div>
               <div className="list-item-content">
-                {article.category && <span className="list-item-category">{article.category}</span>}
+                <div className="list-item-top">
+                  {article.category && <span className="list-item-category">{article.category}</span>}
+                  <div className="list-item-stats">
+                    <span>👁️ {article.views || 0}</span>
+                    <span>❤️ {article.likes || 0}</span>
+                  </div>
+                </div>
                 <h2>{article.title}</h2>
-                <p>{extractExcerpt(article.content)}</p>
+                <p>{article.excerpt || extractExcerpt(article.content)}</p>
                 <span className="list-item-date">{formatDate(article.created_at)}</span>
               </div>
             </Link>
