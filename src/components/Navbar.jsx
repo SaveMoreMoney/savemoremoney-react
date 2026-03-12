@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useApp } from '../contexts/AppContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme, searchArticles } = useApp();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchRef = useRef(null);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -13,6 +17,46 @@ const Navbar = () => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  // Filter articles based on search query
+  const filteredArticles = searchQuery.length > 0 
+    ? searchArticles.filter(article => 
+        article.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 5) // Limit to 5 results
+    : [];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchRef.current?.querySelector('input')?.focus();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setShowSearchResults(true);
+  };
+
+  const handleSearchResultClick = (slug) => {
+    navigate(`/${slug}`);
+    setShowSearchResults(false);
+    setSearchQuery('');
   };
 
   return (
@@ -24,9 +68,35 @@ const Navbar = () => {
         </NavLink>
         
         <div className="nav-center">
-          <div className="search-bar">
-            <span>Search for 'Tax' or 'Credit Cards'...</span>
-            <span className="search-shortcut">⌘K</span>
+          <div className="search-container" ref={searchRef}>
+            <div className="search-bar">
+              <input 
+                type="text" 
+                placeholder="Search for 'Tax' or 'Credit Cards'..." 
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => setShowSearchResults(true)}
+              />
+              <span className="search-shortcut">⌘K</span>
+            </div>
+            
+            {showSearchResults && searchQuery.length > 0 && (
+              <div className="search-results">
+                {filteredArticles.length > 0 ? (
+                  <ul>
+                    {filteredArticles.map(article => (
+                      <li key={article.id}>
+                        <button onClick={() => handleSearchResultClick(article.slug)}>
+                          {article.title}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="no-results">No results found</div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

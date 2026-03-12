@@ -1,10 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import TableOfContents from '../components/TableOfContents';
 import './AboutPage.css';
 
 const AboutPage = () => {
   const contentRef = useRef(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './FinancialSnapshot.css';
 
@@ -8,41 +8,6 @@ const FinancialSnapshot = ({ articles }) => {
   const [sipRate, setSipRate] = useState(12);
   const [sipResult, setSipResult] = useState(null);
   const [showSipResult, setShowSipResult] = useState(false);
-  const [rates, setRates] = useState({
-    gold: { value: 'Loading...', change: 0 },
-    usd: { value: 'Loading...', change: 0 },
-    sensex: { value: 'Loading...', change: 0 },
-    nifty: { value: 'Loading...', change: 0 },
-  });
-
-  useEffect(() => {
-    const fetchRates = async () => {
-      try {
-        const usdRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        const usdData = await usdRes.json();
-        const usdRate = usdData.rates.INR;
-        
-        const randomChange = () => (Math.random() * 2 - 1);
-
-        setRates({
-          gold: { value: '₹ 7,250/gm', change: randomChange() },
-          usd: { value: `₹ ${usdRate.toFixed(2)}`, change: randomChange() },
-          sensex: { value: '74,200', change: randomChange() },
-          nifty: { value: '22,500', change: randomChange() },
-        });
-      } catch (error) {
-        console.error("Failed to fetch rates", error);
-        setRates({
-          gold: { value: '₹ 7,250/gm', change: 0.5 },
-          usd: { value: '₹ 83.50', change: -0.1 },
-          sensex: { value: '74,200', change: 1.2 },
-          nifty: { value: '22,500', change: 1.1 },
-        });
-      }
-    };
-
-    fetchRates();
-  }, []);
 
   const calculateSIP = (e) => {
     e.preventDefault();
@@ -61,63 +26,15 @@ const FinancialSnapshot = ({ articles }) => {
     ? articles[Math.floor(Math.random() * articles.length)] 
     : null;
 
-  const extractExcerpt = (htmlContent, maxLength = 120) => {
+  const extractExcerpt = (htmlContent, maxLength = 80) => {
     const div = document.createElement('div');
     div.innerHTML = htmlContent;
     const text = div.textContent || div.innerText || '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  const formatChange = (change) => {
-    const isPositive = change >= 0;
-    return `${isPositive ? '+' : ''}${change.toFixed(2)}%`;
-  };
-
   return (
     <section className="financial-snapshot-grid">
-      {/* Live Rates Card */}
-      <div className="snapshot-card live-rates">
-        <h3>Live Market Rates</h3>
-        <div className="rates-grid">
-          <div className="rate-item">
-            <span className="rate-label">Gold (24K)</span>
-            <div className="rate-value-group">
-              <strong>{rates.gold.value}</strong>
-              <span className={`rate-change ${rates.gold.change >= 0 ? 'positive' : 'negative'}`}>
-                {formatChange(rates.gold.change)}
-              </span>
-            </div>
-          </div>
-          <div className="rate-item">
-            <span className="rate-label">USD/INR</span>
-            <div className="rate-value-group">
-              <strong>{rates.usd.value}</strong>
-              <span className={`rate-change ${rates.usd.change >= 0 ? 'positive' : 'negative'}`}>
-                {formatChange(rates.usd.change)}
-              </span>
-            </div>
-          </div>
-          <div className="rate-item">
-            <span className="rate-label">Sensex</span>
-            <div className="rate-value-group">
-              <strong>{rates.sensex.value}</strong>
-              <span className={`rate-change ${rates.sensex.change >= 0 ? 'positive' : 'negative'}`}>
-                {formatChange(rates.sensex.change)}
-              </span>
-            </div>
-          </div>
-          <div className="rate-item">
-            <span className="rate-label">Nifty 50</span>
-            <div className="rate-value-group">
-              <strong>{rates.nifty.value}</strong>
-              <span className={`rate-change ${rates.nifty.change >= 0 ? 'positive' : 'negative'}`}>
-                {formatChange(rates.nifty.change)}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* SIP Calculator Card */}
       <div className="snapshot-card sip-calculator">
         <h3>Quick SIP Calculator</h3>
@@ -171,6 +88,27 @@ const FinancialSnapshot = ({ articles }) => {
           </div>
         )}
       </div>
+
+      {/* Youtube Explore Card */}
+      <a href="https://www.youtube.com/@savemoremoney-nishant/" target="_blank" rel="noopener noreferrer" className="snapshot-card youtube-card">
+        <div className="youtube-content">
+          <div className="youtube-header">
+            <img 
+              src="https://ui-avatars.com/api/?name=Nishant+Gupta&background=ff0000&color=fff&size=128&font-size=0.5" 
+              alt="SaveMoreMoney Nishant" 
+              className="youtube-avatar"
+            />
+            <div className="youtube-info">
+              <h3>SaveMoreMoney - Nishant</h3>
+              <span className="youtube-sub-text">Subscribe for Financial Wisdom</span>
+            </div>
+          </div>
+          <p>Watch expert financial advice, tips, and strategies on our channel.</p>
+          <span className="visit-channel-btn">
+            <span className="play-icon">▶</span> Visit Channel
+          </span>
+        </div>
+      </a>
 
       {/* Trending Now Card */}
       <div className="snapshot-card trending-now horizontal">

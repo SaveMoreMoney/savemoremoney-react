@@ -5,28 +5,43 @@ import { supabase } from '../services/supabaseClient';
 import { getCachedData, setCachedData } from '../utils/storage';
 import './ArticlesPage.css';
 
-const ARTICLES_PER_PAGE = 9;
-
 const ArticlesPage = () => {
   const [articles, setArticles] = useState([]);
+  const [allArticles, setAllArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [totalPages, setTotalPages] = useState(1);
+  const [articlesPerPage, setArticlesPerPage] = useState(9); // Default to 3 columns
+
+  // Determine articles per page based on screen width
+  useEffect(() => {
+    const updateArticlesPerPage = () => {
+      const width = window.innerWidth;
+      // Based on minmax(300px, 1fr) and some padding/gap assumptions
+      // Container max-width is 1400px
+      if (width > 1250) {
+        setArticlesPerPage(8); // 4 columns * 2 rows
+      } else if (width > 950) {
+        setArticlesPerPage(9); // 3 columns * 3 rows
+      } else {
+        setArticlesPerPage(8); // 2 columns * 4 rows or 1 column * 8 rows
+      }
+    };
+
+    updateArticlesPerPage();
+    window.addEventListener('resize', updateArticlesPerPage);
+    return () => window.removeEventListener('resize', updateArticlesPerPage);
+  }, []);
 
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
       
-      // Try to get cached articles first
-      // Note: For pagination, caching all articles might be heavy if there are thousands.
-      // But for a blog with < 1000 articles, it's fine to fetch all and paginate client-side for speed
-      // or implement server-side pagination. Here we'll stick to client-side pagination for simplicity with existing cache logic.
-      
-      let allArticles = getCachedData('articles');
+      let fetchedArticles = getCachedData('articles');
 
-      if (!allArticles) {
+      if (!fetchedArticles) {
         const { data, error } = await supabase
           .from('articles')
           .select('*')
@@ -39,24 +54,31 @@ const ArticlesPage = () => {
           setLoading(false);
           return;
         } else {
-          allArticles = data;
+          fetchedArticles = data;
           setCachedData('articles', data);
         }
       }
 
-      setTotalPages(Math.ceil(allArticles.length / ARTICLES_PER_PAGE));
-      
-      // Slice articles for current page
-      const startIndex = (currentPage - 1) * ARTICLES_PER_PAGE;
-      const endIndex = startIndex + ARTICLES_PER_PAGE;
-      setArticles(allArticles.slice(startIndex, endIndex));
-      
+      setAllArticles(fetchedArticles);
       setLoading(false);
-      window.scrollTo(0, 0);
     };
 
     fetchArticles();
-  }, [currentPage]);
+  }, []);
+
+  // Handle pagination whenever page, articles, or articlesPerPage changes
+  useEffect(() => {
+    if (allArticles.length === 0) return;
+
+    setTotalPages(Math.ceil(allArticles.length / articlesPerPage));
+    
+    // Slice articles for current page
+    const startIndex = (currentPage - 1) * articlesPerPage;
+    const endIndex = startIndex + articlesPerPage;
+    setArticles(allArticles.slice(startIndex, endIndex));
+    
+    window.scrollTo(0, 0);
+  }, [currentPage, allArticles, articlesPerPage]);
 
   const handlePageChange = (newPage) => {
     setSearchParams({ page: newPage });
@@ -68,9 +90,22 @@ const ArticlesPage = () => {
   };
 
   const extractExcerpt = (htmlContent, maxLength = 100) => {
-    const div = document.createElement('div');
-    div.innerHTML = htmlContent;
-    const text = div.textContent || div.innerText || '';
+    // Create a temporary element to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    
+    // Get text content (handles entities mostly automatically in browser DOM)
+    let text = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Explicitly decode some common entities if browser DOM doesn't catch them all from innerHTML source
+    const decodeEntities = (str) => {
+      const textarea = document.createElement('textarea');
+      textarea.innerHTML = str;
+      return textarea.value;
+    };
+    
+    text = decodeEntities(text);
+
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
@@ -121,7 +156,7 @@ const ArticlesPage = () => {
                   </div>
                 </div>
                 <h2>{article.title}</h2>
-                <p>{article.excerpt || extractExcerpt(article.content)}</p>
+                <p>{article.excerpt ? extractExcerpt(article.excerpt) : extractExcerpt(article.content)}</p>
                 <span className="list-item-date">{formatDate(article.created_at)}</span>
               </div>
             </Link>

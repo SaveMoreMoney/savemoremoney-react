@@ -99,7 +99,7 @@ const HomePage = () => {
                 <span className="stat-label">Readers</span>
               </div>
               <div className="stat-item">
-                <span className="stat-number">5+</span>
+                <span className="stat-number">7+</span>
                 <span className="stat-label">Years of Exp</span>
               </div>
               <div className="stat-item">
