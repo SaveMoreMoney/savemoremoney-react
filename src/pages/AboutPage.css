@@ -1,7 +1,7 @@
 .about-page-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: var(--spacing-2xl) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-md);
 }
 
 .about-layout {

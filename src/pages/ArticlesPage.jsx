@@ -3,7 +3,10 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../services/supabaseClient';
 import { getCachedData, setCachedData } from '../utils/storage';
+import { decodeHTMLEntities, extractExcerpt } from '../utils/textUtils';
 import './ArticlesPage.css';
+
+const CATEGORIES = ['All', 'Personal Finance', 'General', 'Investing', 'Credit Cards', 'Travel', 'Insurance', 'Tax', 'Other'];
 
 const ArticlesPage = () => {
   const [articles, setArticles] = useState([]);
@@ -12,6 +15,7 @@ const ArticlesPage = () => {
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const activeCategory = searchParams.get('category') || 'All';
   const [totalPages, setTotalPages] = useState(1);
   const [articlesPerPage, setArticlesPerPage] = useState(9); // Default to 3 columns
 
@@ -66,47 +70,52 @@ const ArticlesPage = () => {
     fetchArticles();
   }, []);
 
-  // Handle pagination whenever page, articles, or articlesPerPage changes
+  // Handle filtering and pagination whenever page, category, articles, or articlesPerPage changes
   useEffect(() => {
     if (allArticles.length === 0) return;
 
-    setTotalPages(Math.ceil(allArticles.length / articlesPerPage));
+    let filteredArticles = allArticles;
+
+    if (activeCategory !== 'All') {
+      filteredArticles = allArticles.filter(article => 
+        article.category === activeCategory || 
+        (activeCategory === 'Other' && !CATEGORIES.includes(article.category) && article.category !== 'All')
+      );
+    }
+
+    setTotalPages(Math.ceil(filteredArticles.length / articlesPerPage) || 1); // Avoid 0 total pages
     
+    // Ensure current page is valid after filtering
+    let safePage = currentPage;
+    if (currentPage > Math.ceil(filteredArticles.length / articlesPerPage) && filteredArticles.length > 0) {
+        safePage = 1;
+        // Updating search params here might cause a re-render loop if not careful, 
+        // but it's okay since we control the inputs.
+        // Actually better to just set it to 1 internally for display and let user click next.
+        // I will update the URL if they are out of bounds.
+        setSearchParams({ category: activeCategory, page: 1 });
+        return; // Let the next effect run
+    }
+
     // Slice articles for current page
-    const startIndex = (currentPage - 1) * articlesPerPage;
+    const startIndex = (safePage - 1) * articlesPerPage;
     const endIndex = startIndex + articlesPerPage;
-    setArticles(allArticles.slice(startIndex, endIndex));
+    setArticles(filteredArticles.slice(startIndex, endIndex));
     
     window.scrollTo(0, 0);
-  }, [currentPage, allArticles, articlesPerPage]);
+  }, [currentPage, activeCategory, allArticles, articlesPerPage, setSearchParams]);
 
   const handlePageChange = (newPage) => {
-    setSearchParams({ page: newPage });
+    setSearchParams({ category: activeCategory, page: newPage });
+  };
+
+  const handleCategoryChange = (category) => {
+    setSearchParams({ category, page: 1 });
   };
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
-  };
-
-  const extractExcerpt = (htmlContent, maxLength = 100) => {
-    // Create a temporary element to parse HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
-    
-    // Get text content (handles entities mostly automatically in browser DOM)
-    let text = tempDiv.textContent || tempDiv.innerText || '';
-    
-    // Explicitly decode some common entities if browser DOM doesn't catch them all from innerHTML source
-    const decodeEntities = (str) => {
-      const textarea = document.createElement('textarea');
-      textarea.innerHTML = str;
-      return textarea.value;
-    };
-    
-    text = decodeEntities(text);
-
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
   if (loading) {
@@ -136,32 +145,58 @@ const ArticlesPage = () => {
           <h1>All Articles</h1>
           <p>Your complete guide to financial wisdom. Dive in!</p>
         </div>
-        
-        <div className="all-articles-grid">
-          {articles.map(article => (
-            <Link to={`/${article.slug}`} key={article.id} className="article-list-item">
-              <div className="list-item-image-wrapper">
-                {article.image_url ? (
-                  <img src={article.image_url} alt={article.title} className="list-item-image" />
-                ) : (
-                  <div className="list-item-placeholder">📊</div>
-                )}
-              </div>
-              <div className="list-item-content">
-                <div className="list-item-top">
-                  {article.category && <span className="list-item-category">{article.category}</span>}
-                  <div className="list-item-stats">
-                    <span>👁️ {article.views || 0}</span>
-                    <span>❤️ {article.likes || 0}</span>
-                  </div>
-                </div>
-                <h2>{article.title}</h2>
-                <p>{article.excerpt ? extractExcerpt(article.excerpt) : extractExcerpt(article.content)}</p>
-                <span className="list-item-date">{formatDate(article.created_at)}</span>
-              </div>
-            </Link>
-          ))}
+
+        {/* Category Filter */}
+        <div className="category-filter-container">
+          <div className="category-filter">
+            {CATEGORIES.map(category => (
+              <button
+                key={category}
+                className={`category-btn ${activeCategory === category ? 'active' : ''}`}
+                onClick={() => handleCategoryChange(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
         </div>
+        
+        {articles.length > 0 ? (
+          <div className="all-articles-grid">
+            {articles.map(article => (
+              <Link to={`/${article.slug}`} key={article.id} className="article-list-item">
+                <div className="list-item-image-wrapper">
+                  {article.image_url ? (
+                    <img src={article.image_url} alt={article.title} className="list-item-image" />
+                  ) : (
+                    <div className="list-item-placeholder">📊</div>
+                  )}
+                </div>
+                <div className="list-item-content">
+                  <div className="list-item-top">
+                    {article.category && <span className="list-item-category">{article.category}</span>}
+                    <div className="list-item-stats">
+                      <span>👁️ {article.views || 0}</span>
+                      <span>❤️ {article.likes || 0}</span>
+                    </div>
+                  </div>
+                  <h2>{decodeHTMLEntities(article.title)}</h2>
+                  <p>{article.excerpt ? extractExcerpt(article.excerpt, 100) : extractExcerpt(article.content, 100)}</p>
+                  <span className="list-item-date">{formatDate(article.created_at)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <div className="empty-state-icon">🔍</div>
+            <h3>No Articles Found</h3>
+            <p>We haven't published any articles in the "{activeCategory}" category yet.</p>
+            <button className="explore-btn" onClick={() => handleCategoryChange('All')} style={{marginTop: '1rem'}}>
+              View All Articles
+            </button>
+          </div>
+        )}
 
         {totalPages > 1 && (
           <div className="pagination">

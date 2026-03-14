@@ -7,7 +7,7 @@
 
 @media (min-width: 1024px) {
   .financial-snapshot-grid {
-    grid-template-columns: 1fr 1.5fr 1fr; /* Keep them in one row: SIP | YouTube | Trending */
+    grid-template-columns: 1fr 1fr 1fr; /* 3 equal columns */
   }
 }
 
@@ -39,109 +39,12 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  min-height: 1.5rem; /* Ensure headers align even if one has an icon and others don't */
-}
-
-/* Youtube Card */
-.youtube-card {
-  background-color: var(--bg-primary); /* Match site theme */
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  grid-column: span 1; /* Reset to normal span on large screens with new layout */
-  position: relative;
-}
-
-/* Remove gradient and specific white text colors for theme adaptability */
-.youtube-card h3 {
-  color: var(--text-primary);
-}
-
-.youtube-bg-overlay {
-  display: none; /* Remove overlay for cleaner look */
-}
-
-.youtube-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  /* Removed justify-content: center to align with other cards */
-}
-
-.youtube-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  flex-grow: 0;
-}
-
-.youtube-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid var(--border-color);
-  background-color: var(--bg-tertiary);
-  object-fit: cover;
-}
-
-.youtube-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.youtube-info h3 {
-  margin-bottom: 0.25rem; /* Override generic margin for inner H3 */
-}
-
-.youtube-sub-text {
-  font-size: 0.875rem;
-  opacity: 0.8;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.youtube-card p {
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-lg);
-  font-size: 1rem;
-  max-width: 500px;
-  line-height: 1.5;
-  flex-grow: 1; /* Push button to bottom */
-}
-
-.visit-channel-btn {
-  background-color: #ff0000; /* YouTube Red */
-  color: white;
-  padding: var(--spacing-sm) var(--spacing-xl);
-  border-radius: var(--radius-xl);
-  font-weight: 700;
-  transition: transform var(--transition-base), background-color var(--transition-base);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  width: fit-content;
-  margin-top: auto; /* Align to bottom */
-}
-
-.visit-channel-btn:hover {
-  background-color: #cc0000;
-}
-
-.play-icon {
-  font-size: 0.8rem;
-}
-
-.youtube-card:hover .visit-channel-btn {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+  min-height: 1.5rem; /* Ensure headers align */
 }
 
 /* SIP Calculator Card */
 .sip-calculator {
-  /* Slightly reduced size handled by grid column ratio */
+  grid-column: span 1;
 }
 
 .sip-calculator .sip-form {
@@ -277,74 +180,172 @@
   border-color: var(--primary-color);
 }
 
-/* Trending Now Card */
-.trending-now.horizontal {
-  grid-column: span 1; /* Reset span */
+
+/* Youtube Card */
+.youtube-card {
+  background-color: var(--bg-primary); /* Match site theme */
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  grid-column: span 1;
 }
 
-.trending-now .trending-content {
+.youtube-content {
   display: flex;
-  flex-direction: column; /* Stack vertically to fit 1 column width */
-  gap: var(--spacing-md);
+  flex-direction: column;
   height: 100%;
 }
 
-.trending-now .trending-img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-  flex-shrink: 0;
-}
-
-.trending-now .trending-text {
+.youtube-header {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  flex: 1; /* Allow text to fill space */
-}
-
-.trending-now .trending-text h3 {
-  font-size: 1.125rem; /* Match other card headings */
-  margin-bottom: var(--spacing-sm);
-}
-
-.trending-now .trending-text h4 {
-  font-size: 1rem;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
-  line-height: 1.3;
-}
-
-.trending-now .trending-excerpt {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
+  align-items: center;
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   flex-grow: 0;
 }
 
-.trending-now .read-now-btn {
-  color: var(--primary-color);
-  font-weight: 600;
-  text-decoration: none;
-  align-self: flex-start;
-  margin-top: auto;
+.youtube-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background-color: var(--bg-tertiary);
+  object-fit: cover;
 }
 
-.trending-now .read-now-btn:hover {
-  text-decoration: underline;
+.youtube-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
+.youtube-info h3 {
+  margin-bottom: 0.25rem;
+}
+
+.youtube-sub-text {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.youtube-card p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1rem;
+  line-height: 1.5;
+  flex-grow: 1; /* Push button to bottom */
+}
+
+.visit-channel-btn {
+  background-color: #ff0000; /* YouTube Red */
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  font-weight: 700;
+  transition: transform var(--transition-base), background-color var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: fit-content;
+  margin-top: auto; /* Align to bottom */
+}
+
+.visit-channel-btn:hover {
+  background-color: #cc0000;
+}
+
+.play-icon {
+  font-size: 0.8rem;
+}
+
+.youtube-card:hover .visit-channel-btn {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+}
+
+/* Instagram Card */
+.instagram-card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  grid-column: span 1;
+}
+
+.instagram-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.instagram-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  flex-grow: 0;
+}
+
+.instagram-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.instagram-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.instagram-info h3 {
+  margin-bottom: 0.25rem;
+}
+
+.instagram-sub-text {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.instagram-card p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1rem;
+  line-height: 1.5;
+  flex-grow: 1; /* Push button to bottom */
+}
+
+.visit-instagram-btn {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  font-weight: 700;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: fit-content;
+  margin-top: auto; /* Align to bottom */
+}
+
+.instagram-card:hover .visit-instagram-btn {
+  transform: scale(1.05);
+  border-color: #d6249f;
+  color: #d6249f;
+}
+
 
 @media (max-width: 992px) {
   .financial-snapshot-grid {
     grid-template-columns: 1fr; /* Stack on smaller screens */
-  }
-  .youtube-card, .trending-now.horizontal {
-    grid-column: span 1;
   }
 }

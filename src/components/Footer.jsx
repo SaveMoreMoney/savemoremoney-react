@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 import './Footer.css';
+import logoImage from '../assets/Logo.png';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -49,8 +50,7 @@ const Footer = () => {
           {/* About Section */}
           <div className="footer-section">
             <div className="footer-logo">
-              <span>💰</span>
-              SaveMoreMoney.in
+              <img src={logoImage} alt="SaveMoreMoney.in Logo" className="footer-logo-image" />
             </div>
             <p>
               Your trusted source for expert financial advice, money-saving tips, 

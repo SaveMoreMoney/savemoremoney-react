@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { supabase } from '../services/supabaseClient';
 import ReadingProgress from '../components/ReadingProgress';
 import TableOfContents from '../components/TableOfContents';
+import { decodeHTMLEntities, extractExcerpt } from '../utils/textUtils';
 import './ArticlePage.css';
 
 const ArticlePage = () => {
@@ -81,13 +82,6 @@ const ArticlePage = () => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   };
 
-  const extractExcerpt = (htmlContent, maxLength = 160) => {
-    const div = document.createElement('div');
-    div.innerHTML = htmlContent;
-    const text = div.textContent || div.innerText || '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-  };
-
   if (loading) {
     return <div className="loader">Loading article...</div>;
   }
@@ -110,10 +104,10 @@ const ArticlePage = () => {
   return (
     <>
       <Helmet>
-        <title>{article.title} | SaveMoreMoney.in</title>
-        <meta name="description" content={article.excerpt || extractExcerpt(article.content)} />
-        <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.excerpt || extractExcerpt(article.content)} />
+        <title>{decodeHTMLEntities(article.title)} | SaveMoreMoney.in</title>
+        <meta name="description" content={article.excerpt ? decodeHTMLEntities(article.excerpt) : extractExcerpt(article.content, 160)} />
+        <meta property="og:title" content={decodeHTMLEntities(article.title)} />
+        <meta property="og:description" content={article.excerpt ? decodeHTMLEntities(article.excerpt) : extractExcerpt(article.content, 160)} />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
       </Helmet>
@@ -133,7 +127,7 @@ const ArticlePage = () => {
                   {article.category && (
                     <span className="article-category">{article.category}</span>
                   )}
-                  <h1>{article.title}</h1>
+                  <h1>{decodeHTMLEntities(article.title)}</h1>
                   <div className="article-meta">
                     <div className="meta-item author-info">
                       <div className="author-avatar-large">
@@ -156,7 +150,7 @@ const ArticlePage = () => {
               {article.image_url && (
                 <img 
                   src={article.image_url} 
-                  alt={article.title} 
+                  alt={decodeHTMLEntities(article.title)}
                   className="article-banner-image" 
                 />
               )}

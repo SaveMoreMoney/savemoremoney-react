@@ -25,23 +25,26 @@
 }
 
 .nav-logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  text-decoration: none;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  transition: color var(--transition-base);
+  height: 100%;
 }
 
-.nav-logo:hover {
-  color: var(--primary-color);
+.nav-logo-image {
+  height: 50px; /* Adjust height as needed */
+  width: auto;
+  object-fit: contain;
+  border-radius: 4px; /* Optional, depending on logo design */
 }
 
-.nav-logo-icon {
-  font-size: 1.75rem;
+/* Because CSS mix-blend-mode cannot perfectly isolate white without affecting dark colors on a dark background,
+   the best and most professional workaround for a white-background JPG in dark mode is to present it as a clean badge. */
+.navbar.dark-mode .nav-logo-image {
+  filter: invert(1) hue-rotate(180deg) brightness(1.2);
+  mix-blend-mode: screen; /* This will make the newly inverted black background transparent */
+  border-radius: 8px;
 }
+
 
 .nav-center {
   flex: 1;
@@ -232,8 +235,8 @@
     display: none;
   }
   
-  .nav-logo {
-    font-size: 1.25rem;
+  .nav-logo-image {
+    height: 32px; /* Slightly smaller on mobile */
   }
   
   .nav-toggle {

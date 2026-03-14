@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
+import { decodeHTMLEntities } from '../utils/textUtils';
 import './Navbar.css';
+
+// Import logo using relative path for Vite to bundle correctly
+import logoImage from '../assets/Logo.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,7 +26,7 @@ const Navbar = () => {
   // Filter articles based on search query
   const filteredArticles = searchQuery.length > 0 
     ? searchArticles.filter(article => 
-        article.title.toLowerCase().includes(searchQuery.toLowerCase())
+        decodeHTMLEntities(article.title).toLowerCase().includes(searchQuery.toLowerCase())
       ).slice(0, 5) // Limit to 5 results
     : [];
 
@@ -63,8 +67,7 @@ const Navbar = () => {
     <nav className={`navbar ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="navbar-container">
         <NavLink to="/" className="nav-logo" onClick={closeMenu}>
-          <span className="nav-logo-icon">💰</span>
-          SaveMoreMoney.in
+          <img src={logoImage} alt="SaveMoreMoney.in Logo" className="nav-logo-image" />
         </NavLink>
         
         <div className="nav-center">
@@ -87,7 +90,7 @@ const Navbar = () => {
                     {filteredArticles.map(article => (
                       <li key={article.id}>
                         <button onClick={() => handleSearchResultClick(article.slug)}>
-                          {article.title}
+                          {decodeHTMLEntities(article.title)}
                         </button>
                       </li>
                     ))}

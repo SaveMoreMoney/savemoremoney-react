@@ -128,8 +128,6 @@ const ArticleEditor = () => {
     // Restore focus and cursor position (approximate)
     setTimeout(() => {
       textarea.focus();
-      const newCursorPos = start + newText.length - text.length; // rough calc
-      // simpler: just focus back
     }, 0);
   };
 
@@ -189,10 +187,13 @@ const ArticleEditor = () => {
                 <label>Category</label>
                 <select name="category" value={formData.category} onChange={handleChange}>
                   <option value="Personal Finance">Personal Finance</option>
+                  <option value="General">General</option>
                   <option value="Investing">Investing</option>
                   <option value="Credit Cards">Credit Cards</option>
                   <option value="Travel">Travel</option>
                   <option value="Insurance">Insurance</option>
+                  <option value="Tax">Tax</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div className="form-group">
