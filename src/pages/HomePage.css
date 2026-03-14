@@ -253,8 +253,8 @@
   display: inline-block;
   padding: var(--spacing-md) var(--spacing-xl);
   background-color: var(--primary-color);
-  color: white;
-  font-weight: 600;
+  color: white !important;
+  font-weight: 600 !important;
   border-radius: var(--radius-md);
   text-decoration: none;
   transition: all var(--transition-base);
@@ -263,13 +263,12 @@
 }
 
 .explore-btn:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+  background-color: var(--primary-dark) !important;
+  transform: translateY(-1px);
 }
 
 .explore-btn.outline {
-  background-color: transparent;
   color: var(--primary-color);
   border-color: var(--primary-color);
 }
