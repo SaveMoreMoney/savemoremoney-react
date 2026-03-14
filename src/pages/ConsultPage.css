@@ -1,0 +1,130 @@
+.consult-page-container {
+  max-width: 1400px; /* Matched global container max-width */
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.consult-header {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto var(--spacing-2xl);
+}
+
+.consult-header h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+}
+
+.consult-header p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.consult-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Make Calendly widget take more space */
+  gap: var(--spacing-2xl);
+  align-items: stretch; /* Stretch to fill height */
+}
+
+.consult-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  justify-content: flex-start;
+}
+
+.info-card {
+  background-color: var(--bg-primary);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-base);
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.info-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.info-card h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.info-card p {
+  color: var(--text-secondary);
+  margin-bottom: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Calendly Widget Styling */
+.calendly-wrapper {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  position: relative;
+  /* Add a subtle background for loading state before iframe kicks in */
+  background-image: linear-gradient(120deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+  min-height: 700px; /* Provide a healthy min-height so it doesn't collapse */
+  height: 100%;
+}
+
+/* The actual iframe injected by Calendly script */
+.calendly-inline-widget iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 700px !important;
+  /* We remove border if it injects one */
+  border: none !important;
+}
+
+@media (max-width: 992px) {
+  .consult-content {
+    grid-template-columns: 1fr;
+  }
+
+  .calendly-wrapper {
+    min-height: 800px; /* Mobile sometimes needs more vertical space for the calendar */
+  }
+
+  .consult-info {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .info-card {
+    flex: 1 1 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .consult-page-container {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .consult-header h1 {
+    font-size: 2rem;
+  }
+
+  .calendly-wrapper {
+    /* Make edge-to-edge on mobile for maximum space */
+    margin: 0 -var(--spacing-md);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    min-height: 900px; /* Lots of space for mobile scroll */
+  }
+}
