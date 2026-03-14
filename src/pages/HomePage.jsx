@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../services/supabaseClient';
 import { getCachedData, setCachedData } from '../utils/storage';
-import { extractExcerpt } from '../utils/textUtils';
+import { extractExcerpt, decodeHTMLEntities } from '../utils/textUtils';
 import FinancialSnapshot from '../components/FinancialSnapshot';
 import HeroAnimation from '../components/HeroAnimation';
 import './HomePage.css';
@@ -142,7 +142,7 @@ const HomePage = () => {
                   )}
                   <div className="bento-content">
                     {activeCategory === 'Latest' && <span className="bento-badge">New</span>}
-                    <h3>{featuredArticle.title}</h3>
+                    <h3>{decodeHTMLEntities(featuredArticle.title)}</h3>
                     <p className="bento-excerpt">{featuredArticle.excerpt ? extractExcerpt(featuredArticle.excerpt, 120) : extractExcerpt(featuredArticle.content, 120)}</p>
                     <div className="bento-meta">
                       <span className="bento-date">{formatDate(featuredArticle.created_at)}</span>
@@ -161,7 +161,7 @@ const HomePage = () => {
                     <div className="bento-placeholder">📊</div>
                   )}
                   <div className="bento-content">
-                    <h3>{article.title}</h3>
+                    <h3>{decodeHTMLEntities(article.title)}</h3>
                     <p className="bento-excerpt">{article.excerpt ? extractExcerpt(article.excerpt, 80) : extractExcerpt(article.content, 80)}</p>
                     <div className="bento-meta">
                       <span className="bento-date">{formatDate(article.created_at)}</span>

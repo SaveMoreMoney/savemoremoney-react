@@ -17,6 +17,7 @@ import AdminPage from './pages/AdminPage'; // Now acts as Dashboard
 import AdminAuth from './pages/AdminAuth';
 import ArticleEditor from './pages/ArticleEditor';
 import ConsultPage from './pages/ConsultPage';
+import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/articles" element={<ArticlesPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/consult" element={<ConsultPage />} />
             
             {/* Admin Routes */}

@@ -98,6 +98,8 @@ const ArticlePage = () => {
   }
 
   const createMarkup = (htmlString) => {
+    // Basic fix to ensure standard text doesn't show entities, though HTML parsing usually handles it.
+    // React's dangerouslySetInnerHTML expects a string.
     return { __html: htmlString };
   };
 

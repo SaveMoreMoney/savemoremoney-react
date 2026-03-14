@@ -320,6 +320,19 @@
   }
 
   .section-header h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem; /* smaller header */
+  }
+
+  .section-header p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bento-box.featured {
+    height: 250px;
+  }
+  .bento-box.featured h3 {
+    font-size: 1.5rem;
   }
 }

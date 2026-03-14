@@ -54,7 +54,7 @@ const ConsultPage = () => {
       
       <div className="consult-page-container container">
         <div className="consult-header">
-          <h1>Book a 1:1 Consultation</h1>
+          <h1>Book a Free 1:1 Consultation</h1>
           <p>
             Get personalized advice on personal finance, investments, tax planning, and credit card strategies tailored to your unique situation.
           </p>

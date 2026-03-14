@@ -121,6 +121,7 @@
   justify-content: center;
   font-size: 3rem;
   color: white;
+  opacity: 0.8;
 }
 
 .list-item-content {
@@ -215,8 +216,8 @@
   display: inline-block;
   padding: var(--spacing-md) var(--spacing-xl);
   background-color: var(--primary-color);
-  color: white;
-  font-weight: 600;
+  color: white !important;
+  font-weight: 600 !important;
   border-radius: var(--radius-md);
   text-decoration: none;
   transition: all var(--transition-base);
@@ -225,7 +226,7 @@
 }
 
 .explore-btn:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--primary-dark) !important;
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
@@ -274,6 +275,14 @@
 }
 
 @media (max-width: 768px) {
+  .articles-page {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .section-header h1 {
+    font-size: 2rem;
+  }
+
   .all-articles-grid {
     grid-template-columns: 1fr;
   }
